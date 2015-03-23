@@ -68,4 +68,12 @@ public class BitOperation {
 		System.out.println(0xFF==255);
 	}
 
+	/**
+	 *
+	 */
+	@Test
+	public void test04(){
+		System.out.print(0xFFFF);
+	}
+
 }
