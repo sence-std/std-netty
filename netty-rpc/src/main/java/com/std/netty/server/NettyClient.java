@@ -9,10 +9,9 @@
  */
 package com.std.netty.server;
 
-import com.std.netty.rpc.NettyClientRpcHandler;
-import com.std.netty.rpc.api.Invocation;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
@@ -37,30 +36,26 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
  * @since 1.0
  * @version 1.0
  */
-public class NettyClient {
+public class NettyClient extends Thread{
 
-	private Invocation invocation;
+	private final ChannelHandlerAdapter adapter;
+	private String host;
+	private int port;
 
-	public NettyClient (Invocation invocation) {
-		this.invocation = invocation;
-	}
-
-	public Invocation getInvocation () {
-		return invocation;
-	}
-
-	public void setInvocation (Invocation invocation) {
-		this.invocation = invocation;
-	}
-
-	public void invoke(String host,int port)throws Exception {
-
-		if(host == null || host.length()==0){
-			throw new IllegalArgumentException("host == null");
-		}
-		if(port<0 || port>65535){
-			throw new IllegalArgumentException("port must between 0 to 65535");
-		}
+	/**
+	 * If this thread was constructed using a separate
+	 * <code>Runnable</code> run object, then that
+	 * <code>Runnable</code> object's <code>run</code> method is called;
+	 * otherwise, this method does nothing and returns.
+	 * <p>
+	 * Subclasses of <code>Thread</code> should override this method.
+	 *
+	 * @see     #start()
+	 * @see     #stop()
+	 * @see     #Thread(ThreadGroup, Runnable, String)
+	 */
+	@Override
+	public void run () {
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		try {
 			Bootstrap b = new Bootstrap(); // (1)
@@ -72,15 +67,34 @@ public class NettyClient {
 				public void initChannel(SocketChannel ch) throws Exception {
 					ch.pipeline().addLast(new ObjectEncoder(),
 							new ObjectDecoder(ClassResolvers.cacheDisabled(null))
-							,new NettyClientRpcHandler(invocation));
+							,adapter);
 				}
 			});
 			// Start the client.
-			ChannelFuture f = b.connect(host, port).sync(); // (5)
+			ChannelFuture f = b.connect(this.host, this.port).sync(); // (5)
 			// Wait until the connection is closed.
 			f.channel().closeFuture().sync();
-		} finally {
+		} catch (Exception e){
+			e.printStackTrace();
+		}finally {
 			workerGroup.shutdownGracefully();
 		}
+	}
+
+	public NettyClient(String host,int port,final ChannelHandlerAdapter adapter)throws Exception {
+
+
+		if(host == null || host.length()==0){
+			throw new IllegalArgumentException("host == null");
+		}
+
+		if(port<0 || port>65535){
+			throw new IllegalArgumentException("port must between 0 to 65535");
+		}
+
+		this.host = host;
+		this.port = port;
+		this.adapter = adapter;
+
 	}
 }

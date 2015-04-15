@@ -11,8 +11,13 @@ package com.std.netty.rpc;
 
 import com.std.netty.rpc.api.Invocation;
 import com.std.netty.rpc.exception.RpcException;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -30,36 +35,46 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public class NettyClientRpcHandler extends ChannelHandlerAdapter{
 
+	private volatile Channel channel;
+	private final BlockingQueue<Object> answer = new LinkedBlockingQueue<Object>();
 
-	private Invocation invocation;
+	public Object sendRpcInvoke(Invocation invocation)throws RpcException{
+		channel.writeAndFlush(invocation);
+		boolean interrupted = false;
+		Object resObj= null;
+		for(;;){
+			try {
+				resObj = answer.take();
+				break;
+			} catch (InterruptedException e) {
+				interrupted = true;
+			}
+		}
+		if(interrupted){
+			Thread.currentThread().interrupt();
+			throw new RpcException("take the answer from server failed");
+		}else {
+			return resObj;
+		}
 
-	public NettyClientRpcHandler (Invocation invocation) {
-		this.invocation = invocation;
 	}
 
 	/**
-	 * 通道激活
+	 * Calls {@link io.netty.channel.ChannelHandlerContext#fireChannelRegistered()} to forward
+	 * to the next {@link ChannelHandler} in the {@link ChannelPipeline}.
+	 *
+	 * Sub-classes may override this method to change behavior.
+
 	 * @param ctx
-	 * @throws Exception
 	 */
 	@Override
-	public void channelActive (ChannelHandlerContext ctx) throws Exception {
-		ctx.writeAndFlush(invocation);
+	public void channelRegistered (ChannelHandlerContext ctx) throws Exception {
+		channel = ctx.channel();
 	}
 
 	@Override
 	public void channelRead (ChannelHandlerContext ctx, Object msg) throws Exception {
-		try {
-			if(invocation instanceof CustomInvocation) {
-				CustomInvocation ci = (CustomInvocation) invocation;
-				ci.setResult(msg);
-			}else{
-				throw new RpcException("invocation error");
-			}
-		}finally {
-			//释放ctx
-			ctx.close();
-		}
+		answer.add(msg);
 	}
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {

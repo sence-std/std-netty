@@ -10,7 +10,10 @@
 package com.std.netty;
 
 import com.std.netty.domain.Hello;
+import com.std.netty.rpc.NettyClientRpcHandler;
+import com.std.netty.rpc.RpcInvocationHanlder;
 import com.std.netty.rpc.ServiceProxyFactory;
+import com.std.netty.server.NettyClient;
 import com.std.netty.server.NettyServer;
 import com.std.netty.service.IHelloService;
 import com.std.netty.service.impl.HelloServiceImpl;
@@ -44,11 +47,16 @@ public class NettyRpcTest {
 	}
 
 	@Test
-	public void testConsumer(){
+	public void testClientStart() throws Exception {
+		NettyClientRpcHandler rpcHandler = new NettyClientRpcHandler();
+		NettyClient nettyClient = new NettyClient(DEFAULT_HOST,DEFAULT_PORT,rpcHandler);
+		nettyClient.start();
+		Thread.sleep(1000);
+		RpcInvocationHanlder invocationHanlder = new RpcInvocationHanlder(rpcHandler);
 		ServiceProxyFactory factory = new ServiceProxyFactory();
-		IHelloService helloService = factory.refer(IHelloService.class,DEFAULT_HOST,DEFAULT_PORT);
-		System.out.print(helloService);
+		IHelloService helloService = factory.refer(IHelloService.class,invocationHanlder);
 		Hello hello = helloService.sayHello("sence","hello");
-		System.out.print(hello);
+		System.out.println(hello);
 	}
+
 }

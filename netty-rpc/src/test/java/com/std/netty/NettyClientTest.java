@@ -58,7 +58,7 @@ public class NettyClientTest {
 				public void initChannel(SocketChannel ch) throws Exception {
 					ch.pipeline().addLast(new ObjectEncoder(),
 							new ObjectDecoder(ClassResolvers.cacheDisabled(null))
-							,new NettyClientRpcHandler(invocation));
+							,new NettyClientRpcHandler());
 				}
 			});
 			// Start the client.
