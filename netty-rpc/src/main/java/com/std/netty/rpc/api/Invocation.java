@@ -26,6 +26,12 @@ package com.std.netty.rpc.api;
 public interface Invocation {
 
 	/**
+	 * 每次调用的token
+	 * @return
+	 */
+	public String getToken();
+
+	/**
 	 * 调用方法的名称
 	 * @return
 	 */
@@ -42,12 +48,6 @@ public interface Invocation {
 	 * @return
 	 */
 	public Object[] getParameters();
-
-	/**
-	 * 调用结果
-	 * @return
-	 */
-	public Object result();
 
 
 }

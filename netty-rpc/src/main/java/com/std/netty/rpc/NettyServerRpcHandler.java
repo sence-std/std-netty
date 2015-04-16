@@ -11,6 +11,7 @@ package com.std.netty.rpc;
 
 import com.std.netty.rpc.api.Invocation;
 import com.std.netty.rpc.exception.RpcException;
+import com.std.netty.rpc.protocol.RpcResponse;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -47,7 +48,8 @@ public class NettyServerRpcHandler extends ChannelHandlerAdapter{
 			Object[] args = invocation.getParameters();
 			Method method = this.getService().getClass().getMethod(methodName,parameterTypes);
 			Object result  = method.invoke(service,args);
-			ctx.writeAndFlush(result);
+			RpcResponse rpcResponse = new RpcResponse(invocation.getToken(),result);
+			ctx.writeAndFlush(rpcResponse);
 		}else{
 			throw new RpcException("rpc exception message not instanceof invocation");
 		}

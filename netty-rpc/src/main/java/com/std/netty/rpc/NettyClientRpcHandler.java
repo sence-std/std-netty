@@ -11,6 +11,7 @@ package com.std.netty.rpc;
 
 import com.std.netty.rpc.api.Invocation;
 import com.std.netty.rpc.exception.RpcException;
+import com.std.netty.rpc.protocol.RpcResponse;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
@@ -36,26 +37,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class NettyClientRpcHandler extends ChannelHandlerAdapter{
 
 	private volatile Channel channel;
-	private final BlockingQueue<Object> answer = new LinkedBlockingQueue<Object>();
-
+	//这儿有一个并发的问题 生产出来的结果不是消费者想要的
+//	private final BlockingQueue<Object> answer = new LinkedBlockingQueue<Object>();
+	private ConcurrentHashMap<Object,Object> map = new ConcurrentHashMap<>();
 	public Object sendRpcInvoke(Invocation invocation)throws RpcException{
 		channel.writeAndFlush(invocation);
-		boolean interrupted = false;
 		Object resObj= null;
 		for(;;){
-			try {
-				resObj = answer.take();
+			if(map.containsKey(invocation.getToken())) {
+				resObj = map.get(invocation.getToken());
 				break;
-			} catch (InterruptedException e) {
-				interrupted = true;
 			}
 		}
-		if(interrupted){
-			Thread.currentThread().interrupt();
-			throw new RpcException("take the answer from server failed");
-		}else {
-			return resObj;
-		}
+		return resObj;
 
 	}
 
@@ -74,7 +68,13 @@ public class NettyClientRpcHandler extends ChannelHandlerAdapter{
 
 	@Override
 	public void channelRead (ChannelHandlerContext ctx, Object msg) throws Exception {
-		answer.add(msg);
+		if(msg instanceof RpcResponse){
+			RpcResponse rr = (RpcResponse)msg;
+			map.put(rr.getToken(),rr.getResult());
+		}else{
+			throw new RpcException("rpc failed");
+		}
+
 	}
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {

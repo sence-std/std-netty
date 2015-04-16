@@ -9,10 +9,9 @@
  */
 package com.std.netty.rpc;
 
-import io.netty.channel.ChannelHandlerAdapter;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.UUID;
 
 /**
  *
@@ -93,6 +92,7 @@ public class RpcInvocationHanlder implements InvocationHandler{
 		invocation.setGetParameters(args);
 		invocation.setParameterTypes(method.getParameterTypes());
 		invocation.setMethodName(method.getName());
+		invocation.setToken(UUID.randomUUID().toString());
 		Object result = rpcHandler.sendRpcInvoke(invocation);
 		return result;
 	}

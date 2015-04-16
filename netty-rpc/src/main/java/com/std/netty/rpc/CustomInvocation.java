@@ -33,10 +33,10 @@ public class CustomInvocation implements Invocation,Serializable {
 	private String methodName;
 	private Class<?>[] parameterTypes;
 	private Object[] getParameters;
-
-	private Object result;
+	private String token;
 
 	public CustomInvocation () {
+
 	}
 
 	public String getMethodName () {
@@ -63,9 +63,6 @@ public class CustomInvocation implements Invocation,Serializable {
 		this.getParameters = getParameters;
 	}
 
-	public Object getResult () {
-		return result;
-	}
 
 	public CustomInvocation (String methodName, Class<?>[] parameterTypes, Object[] getParameters) {
 		this.methodName = methodName;
@@ -99,18 +96,12 @@ public class CustomInvocation implements Invocation,Serializable {
 		return this.getParameters;
 	}
 
-	/**
-	 * 调用结果
-	 * @return
-	 */
 	@Override
-	public Object result () {
-		return result;
+	public String getToken () {
+		return token;
 	}
 
-	public void setResult(Object result){
-		this.result = result;
+	public void setToken (String token) {
+		this.token = token;
 	}
-
-
 }

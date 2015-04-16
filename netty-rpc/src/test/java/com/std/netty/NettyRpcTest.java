@@ -9,7 +9,6 @@
  */
 package com.std.netty;
 
-import com.std.netty.domain.Hello;
 import com.std.netty.rpc.NettyClientRpcHandler;
 import com.std.netty.rpc.RpcInvocationHanlder;
 import com.std.netty.rpc.ServiceProxyFactory;
@@ -18,6 +17,9 @@ import com.std.netty.server.NettyServer;
 import com.std.netty.service.IHelloService;
 import com.std.netty.service.impl.HelloServiceImpl;
 import org.junit.Test;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -55,8 +57,12 @@ public class NettyRpcTest {
 		RpcInvocationHanlder invocationHanlder = new RpcInvocationHanlder(rpcHandler);
 		ServiceProxyFactory factory = new ServiceProxyFactory();
 		IHelloService helloService = factory.refer(IHelloService.class,invocationHanlder);
-		Hello hello = helloService.sayHello("sence","hello");
-		System.out.println(hello);
+		ExecutorService exec = Executors.newCachedThreadPool();
+		for (int index = 0; index < 3000; index++) {
+			exec.execute(new HelloRunable(helloService));
+		}
+		exec.shutdown();
+		Thread.sleep(600000);
 	}
 
 }
