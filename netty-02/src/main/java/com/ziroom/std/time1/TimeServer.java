@@ -1,12 +1,12 @@
 /**
- * @FileName: EchoServer.java
- * @Package: com.netty.std.echo
+ * @FileName: TimeServer.java
+ * @Package: com.ziroom.std
  * @author liusq23
- * @created 2017/2/19 下午5:07
+ * @created 2017/2/19 下午5:46
  * <p>
  * Copyright 2015 ziroom
  */
-package com.netty.std.echo;
+package com.ziroom.std.time1;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -31,44 +31,39 @@ import io.netty.handler.logging.LoggingHandler;
  * @since 1.0
  * @version 1.0
  */
-public class EchoServer {
+public class TimeServer {
 
     private int port;
 
-    public EchoServer(int port) {
+    public TimeServer(int port) {
         this.port = port;
     }
 
     public void start() throws InterruptedException {
-
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup,workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new EchoServerHandler());
+                            ch.pipeline().addLast(new TimeServerHandler());
                         }
                     });
-            ChannelFuture channelFuture = bootstrap.bind(port).sync();
-            channelFuture.channel().closeFuture().sync();
+            ChannelFuture future = bootstrap.bind(port).sync();
+            future.channel().closeFuture().sync();
         }finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
+
     }
 
-    /**
-     * telnet localhost 8080
-     *
-     * @param args
-     * @throws InterruptedException
-     */
     public static void main(String[] args) throws InterruptedException {
-        new EchoServer(8080).start();
+        new TimeServer(8080).start();
     }
+
 }

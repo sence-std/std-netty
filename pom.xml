@@ -11,6 +11,7 @@
     <modules>
         <module>netty-01</module>
         <module>netty-rpc</module>
+        <module>netty-02</module>
     </modules>
 
     <properties>
@@ -34,5 +35,21 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.6.1</version>
+                    <configuration>
+                        <target>1.8</target>
+                        <source>1.8</source>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
