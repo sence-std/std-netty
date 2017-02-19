@@ -9,8 +9,11 @@
  */
 package com.netty.std.echo;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.ReferenceCountUtil;
 
 /**
  *
@@ -32,15 +35,21 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class EchoServerHandler extends ChannelInboundHandlerAdapter{
 
 	@Override
-	public void channelRead (ChannelHandlerContext ctx, Object msg) throws Exception {
+	public void channelRead (final ChannelHandlerContext ctx, Object msg) throws Exception {
 		/**
 		 * ByteBuf is a reference-counted object which has to be released explicitly via the release() method.
 		 * Please keep in mind that it is the handler's responsibility to release any reference-counted object passed to the handler
 		 */
-		ctx.writeAndFlush(msg);
+		final ChannelFuture cf = ctx.writeAndFlush(msg);
 		//这里不能释放msg，因为当写到wire后netty会自动为我们释放，如果此处释放会发生异常
 		//ReferenceCountUtil.release(msg);
-
+		//ctx.close();
+		cf.addListener(new ChannelFutureListener() {
+			public void operationComplete (ChannelFuture channelFuture) throws Exception {
+				assert cf == channelFuture;
+				ctx.close();
+			}
+		});
 	}
 
 	@Override

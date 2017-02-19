@@ -49,7 +49,6 @@ public class TimeServerHandler extends ChannelInboundHandlerAdapter{
 		final ChannelFuture cf = ctx.writeAndFlush(time);
 		//注册一个监听 事件驱动
 		cf.addListener(new ChannelFutureListener() {
-			@Override
 			public void operationComplete (ChannelFuture channelFuture) throws Exception {
 				assert cf == channelFuture;
 				ctx.close();
