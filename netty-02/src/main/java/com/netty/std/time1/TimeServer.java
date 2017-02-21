@@ -1,12 +1,12 @@
 /**
  * @FileName: TimeServer.java
- * @Package: com.ziroom.std
+ * @Package: com.netty.std
  * @author liusq23
  * @created 2017/2/19 下午5:46
  * <p>
- * Copyright 2015 ziroom
+ * Copyright 2015 sence
  */
-package com.ziroom.std.time1;
+package com.netty.std.time1;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -39,6 +39,10 @@ public class TimeServer {
         this.port = port;
     }
 
+    public static void main(String[] args) throws InterruptedException {
+        new TimeServer(8080).start();
+    }
+
     public void start() throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -60,10 +64,6 @@ public class TimeServer {
             bossGroup.shutdownGracefully();
         }
 
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        new TimeServer(8080).start();
     }
 
 }

@@ -1,25 +1,23 @@
 /**
  * @FileName: TimeServerHandler.java
- * @Package: com.ziroom.std.time1
+ * @Package: com.netty.std.time1
  * @author liusq23
  * @created 2017/2/19 下午5:54
  * <p>
- * Copyright 2015 ziroom
+ * Copyright 2015 sence
  */
-package com.ziroom.std.time1;
+package com.netty.std.time1;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.util.ReferenceCountUtil;
 
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.time.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
 
 /**
  * <p></p>
@@ -36,6 +34,11 @@ import java.util.Date;
  */
 public class TimeServerHandler extends ChannelInboundHandlerAdapter {
 
+    public static void main(String[] args) {
+        LocalDateTime _time = LocalDateTime.now();
+        System.out.print(_time.getSecond());
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf timeLocateByte = (ByteBuf)msg;
@@ -50,10 +53,5 @@ public class TimeServerHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
         ctx.close();
-    }
-
-    public static void main(String[] args) {
-        LocalDateTime _time = LocalDateTime.now();
-        System.out.print(_time.getSecond());
     }
 }

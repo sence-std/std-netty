@@ -1,9 +1,9 @@
 /**
  * @FileName: package-info.java
- * @Package: com.ziroom.std
+ * @Package: com.netty.std
  * @author liusq23
  * @created 2017/2/19 下午5:42
  * <p>
- * Copyright 2015 ziroom
+ * Copyright 2015 sence
  */
-package com.ziroom.std;
+package com.netty.std;

@@ -1,12 +1,12 @@
 /**
  * @FileName: TimeClientHandler.java
- * @Package: com.ziroom.std.time1
+ * @Package: com.netty.std.time1
  * @author liusq23
  * @created 2017/2/19 下午7:43
  * <p>
- * Copyright 2015 ziroom
+ * Copyright 2015 sence
  */
-package com.ziroom.std.time1;
+package com.netty.std.time1;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -15,12 +15,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.Buffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.Date;
 
 /**
  * <p></p>
